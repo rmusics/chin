@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SS1中文(字詞學習)</title>
+<style>
+    :root {
+        /* 預設主題色，會隨著不同分頁自動改變 */
+        --primary-color: #4CAF50;
+        --bg-color: #f4f9f4;
+        --text-color: #333;
+    }
+    body {
+        font-family: 'Microsoft JhengHei', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        text-align: center;
+        margin: 0;
+        padding: 1vw;
+        overflow-x: hidden;
+    }
+    .container {
+        width: 98vw;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        min-height: 90vh;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+    .content-area {
+        flex-grow: 1;
+    }
+    
+    /* 標題統一改為黑色 */
+    h1 { font-size: 3em; color: black; margin-bottom: 20px; }
+    
+    /* 副標題跟隨主題色 */
+    h2 { font-size: 2.5em; color: var(--primary-color); }
+    h3 { font-size: 1.8em; color: #555; }
+    
+    /* 預設按鈕跟隨主題色 */
+    button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        margin: 10px;
+        font-size: 1.5em;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    button:hover { filter: brightness(0.9); transform: translateY(-2px); }
+    
+    /* 主選單的正方形按鈕樣式 */
+    .menu-square-btn {
+        width: 200px;
+        height: 200px;
+        font-size: 1.8em;
+        padding: 10px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.5;
+        border-radius: 20px;
+    }
+
+    /* 主選單的專屬顏色按鈕 */
+    .btn-menu-red { background-color: #F44336 !important; }
+    .btn-menu-orange { background-color: #FF9800 !important; }
+    .btn-menu-green { background-color: #4CAF50 !important; }
+    .btn-menu-blue { background-color: #2196F3 !important; }
+
+    /* 底部按鈕區 */
+    .footer-area {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 3px dashed #eee;
+    }
+    .btn-home { background-color: #607D8B !important; font-size: 1.8em; padding: 15px 40px;}
+    
+    /* 特殊功能按鈕保持固定顏色以便認知 */
+    .btn-audio { background-color: #00BCD4 !important; font-size: 1.2em; }
+    .btn-detail { background-color: #9C27B0 !important; font-size: 1.2em; padding: 10px 20px; width: 90%; margin-top: 10px;}
+
+    /* 解說文字旁邊的小播放鍵 */
+    .btn-audio-small {
+        background-color: #03A9F4 !important;
+        font-size: 0.8em;
+        padding: 8px 15px;
+        margin-left: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* 網格與列表樣式 */
+    .grid-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .category-section {
+        border-bottom: 3px dashed #eee;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* 教學及重溫目錄的字詞卡放大 */
+    .word-card {
+        border: 3px solid #ddd;
+        border-radius: 15px;
+        padding: 20px;
+        width: 280px; 
+        background: #fafafa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .word-card img {
+        width: 240px; height: 240px; 
+        object-fit: contain; 
+        border-radius: 10px; 
+        background-color: white; 
+    }
+
+    /* 遊戲上方區域 */
+    .game-top-area {
+        width: 100%;
+        background: #f9f9f9;
+        padding: 30px;
+        border-radius: 20px;
+        border: 2px solid #eee;
+        margin-bottom: 30px;
+        box-sizing: border-box;
+    }
+    
+    /* 圖片尺寸維持 280px */
+    .game-top-img {
+        width: 280px; 
+        height: 280px;
+        object-fit: contain; 
+        border-radius: 15px;
+        border: 5px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+    
+    /* 答題框與圖片尺寸對齊 */
+    .drop-zone {
+        width: 280px;
+        height: 280px;
+        border: 6px dashed var(--primary-color);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f8ff;
+        font-size: 2em;
+        color: #aaa;
+        box-sizing: border-box; 
+    }
+
+    /* 教學/重溫 詳細模式中放大的圖片 (兩張並排) */
+    .detail-top-img {
+        width: 320px; 
+        height: 320px;
+        object-fit: contain; 
+        border-radius: 15px;
+        border: 5px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+
+    /* 總結重溫專用：超大圖片 (已放大尺寸) */
+    .summary-top-img {
+        width: 420px; 
+        height: 420px;
+        object-fit: contain; 
+        border-radius: 15px;
+        border: 6px solid white;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        background-color: white;
+    }
+
+    /* 下方選項區 */
+    .game-bottom-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 30px;
+    }
+    
+    .panel {
+        width: 90%;
+        max-width: 900px;
+        background: #fdfdfd;
+        padding: 30px;
+        border-radius: 20px;
+        border: 3px dashed #ccc;
+    }
+    
+    .options-area {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .draggable-item {
+        width: 250px;
+        height: 250px;
+        cursor: pointer; 
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        object-fit: contain; 
+        background-color: white;
+        transition: transform 0.2s;
+    }
+    .draggable-item:hover {
+        transform: scale(1.05); 
+    }
+    .draggable-item:active {
+        cursor: grabbing;
+    }
+    
+    /* 教學詳細解說方框 */
+    .detail-box {
+        background: #fff9c4;
+        padding: 30px;
+        border-radius: 15px;
+        border: 3px solid #fbc02d;
+        margin: 20px auto;
+        width: 80%;
+        text-align: left;
+        font-size: 1.8em;
+        line-height: 1.8;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .detail-box p {
+        margin: 15px 0;
+    }
+    
+    .hidden { display: none !important; }
+    #game-result { font-size: 3em; font-weight: bold; margin: 20px 0; min-height: 1.2em; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="content-area">
+        <div id="header">
+            <h1 id="page-title">SS1中文(字詞學習)</h1>
+        </div>
+
+        <div id="main-menu">
+            <div id="unit-info" style="margin-bottom: 50px; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 40px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <h2 style="color: #555; font-size: 2.8em; margin: 0;">欣賞演奏會</h2>
+                    <button class="btn-audio" style="margin: 0; padding: 15px 25px; border-radius: 15px;" onclick="playAudio('欣賞演奏會')">🔊 讀音</button>
+                </div>
+                <img src="unit-cover.png" style="max-height: 250px; max-width: 400px; width: auto; height: auto; object-fit: contain; border-radius: 15px; border: 4px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background-color: white; padding: 5px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMzIiPueEoeWcluAHk8L3RleHQ+PC9zdmc+'">
+            </div>
+
+            <div style="display: flex; flex-direction: row; justify-content: center; gap: 30px; flex-wrap: wrap;">
+                <button class="btn-menu-red menu-square-btn" onclick="showPage('teaching')">
+                    1.<br>教學模式
+                </button>
+                <button class="btn-menu-orange menu-square-btn" onclick="showPage('practice-basic-menu')">
+                    2.<br>練習模式<br>(初)
+                </button>
+                <button class="btn-menu-green menu-square-btn" onclick="showPage('practice-adv-menu')">
+                    3.<br>練習模式<br>(高)
+                </button>
+                <button class="btn-menu-blue menu-square-btn" onclick="showPage('summary')">
+                    4.<br>總結重溫
+                </button>
+            </div>
+        </div>
+
+        <div id="teaching-view" class="hidden">
+            <div id="teaching-content"></div>
+        </div>
+
+        <div id="teaching-detail-view" class="hidden">
+            <div id="teaching-detail-content"></div>
+            <button id="btn-back-to-dict" style="margin-top: 30px;">🔙 返回目錄</button>
+        </div>
+
+        <div id="summary-view" class="hidden">
+            <div class="game-top-area" style="display: flex; flex-direction: column; align-items: center; padding: 40px;">
+                <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px;">
+                    <img id="summary-img1" class="summary-top-img" src="" onerror="this.style.display='none'">
+                    <img id="summary-img2" class="summary-top-img" src="" onerror="this.style.display='none'">
+                </div>
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 40px; margin-top: 30px;">
+                    <div id="summary-word" style="font-size: 6em; font-weight: bold; color: black; line-height: 1.2;"></div>
+                    <button id="summary-audio-btn" class="btn-audio" style="font-size: 1.8em; padding: 20px 40px; border-radius: 15px;">🔊 讀音</button>
+                </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: row; justify-content: center; gap: 40px; margin-top: 20px;">
+                <button id="btn-summary-prev" onclick="changeSummary(-1)" style="background-color: #FF9800; font-size: 1.8em; padding: 15px 40px;">⬅️ 上一個字詞</button>
+                <button id="btn-summary-next" onclick="changeSummary(1)" style="background-color: #4CAF50; font-size: 1.8em; padding: 15px 40px;">下一個字詞 ➡️</button>
+            </div>
+        </div>
+
+        <div id="practice-basic-menu" class="hidden"><h2>練習模式 (初)</h2><div id="basic-q-list" class="grid-container"></div></div>
+        <div id="practice-adv-menu" class="hidden"><h2>練習模式 (高)</h2><div id="adv-q-list" class="grid-container"></div></div>
+
+        <div id="game-view" class="hidden">
+            <div class="game-top-area" id="game-header-area"></div>
+
+            <div class="game-bottom-area">
+                <div class="panel">
+                    <div class="options-area" id="options-area"></div>
+                </div>
+            </div>
+
+            <div id="game-result"></div>
+            <button onclick="restartGame()">🔄 重新開始本題</button>
+            <button id="btn-next-q">⏭️ 下一題</button>
+            <button id="btn-back-to-mode">🔙 返回選單</button>
+        </div>
+    </div>
+
+    <div class="footer-area">
+        <button class="btn-home hidden" id="btn-main-menu" onclick="showPage('main-menu')">🏠 返回主頁</button>
+    </div>
+</div>
+
+<script>
+    // 字詞資料
+    const vocabData = [
+        { id: 1, type: "名詞", word: "演奏會", img1: "p1.jpg", img2: "pp1.png", meaning: "大家坐在一起聽音樂表演的地方。", example: "我們去大會堂聽演奏會。" },
+        { id: 2, type: "名詞", word: "場刊", img1: "p2.png", img2: "pp2.png", meaning: "介紹表演內容的小冊子。", example: "我閱讀場刊，才知道下一個節目是甚麼。" },
+        { id: 3, type: "名詞", word: "小提琴", img1: "p3.jpg", img2: "pp3.png", meaning: "一種用弓拉出聲音的樂器。", example: "弟弟拉小提琴，聲音真好聽。" },
+        { id: 4, type: "名詞", word: "長笛", img1: "p4.jpg", img2: "pp4.jpg", meaning: "一種用嘴巴吹的長長樂器。", example: "姐姐吹長笛，聲音很清脆。" },
+        { id: 5, type: "動詞", word: "欣賞", img1: "p5.png", img2: "pp5.png", meaning: "用心去看、去聽美好的事物。", example: "我們安靜地欣賞音樂表演。" },
+        { id: 6, type: "動詞", word: "鼓掌", img1: "p6.png", img2: "pp6.jpg", meaning: "拍拍手，表示開心和讚賞。", example: "表演結束，大家一起拍手鼓掌。" },
+        { id: 7, type: "形容詞", word: "動聽", img1: "p7.png", img2: "pp7.png", meaning: "聲音很好聽。", example: "這首歌真動聽！" },
+        { id: 8, type: "形容詞", word: "完美", img1: "p8.png", img2: "pp8.png", meaning: "做得非常棒，沒有出錯。", example: "這是一場完美的表演。" }
+    ];
+
+    let currentGameMode = '';
+    let currentDictionarySource = 'teaching'; 
+    let currentQuestionData = null;
+    let currentSummaryIndex = 0; // 用於追蹤總結重溫的頁數
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // ★ 修改點：加入了 utterance.rate = 0.75; 來調慢系統語音的速度
+    function playAudio(text) {
+        // 先取消正在播放的語音，避免重疊
+        window.speechSynthesis.cancel();
+        
+        if (text === '場刊') {
+            const audio = new Audio('p2.mp3');
+            // 如果你連「場刊」的 mp3 錄音檔也想調慢，可以取消下面這行的註解並調整數值
+            // audio.playbackRate = 0.8; 
+            audio.play();
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-HK';
+        
+        // ★ 這裡調整速度：1 是正常，小於 1 變慢（建議 0.5 ~ 0.9），大於 1 變快
+        utterance.rate = 0.75; 
+        
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function createPopSound(time, duration, pitch) {
+        const bufferSize = audioCtx.sampleRate * duration;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; 
+        
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = pitch;
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.5, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        noise.start(time);
+        noise.stop(time + duration);
+    }
+
+    function playFeedbackSound(isCorrect) {
+        initAudio();
+        const now = audioCtx.currentTime;
+
+        if (isCorrect) {
+            for(let i = 0; i < 20; i++) {
+                let offset = Math.random() * 0.8; 
+                let pitch = 800 + Math.random() * 1000; 
+                createPopSound(now + offset, 0.1, pitch);
+            }
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.linearRampToValueAtTime(880, now + 0.2); 
+            
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.3, now + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+            
+            osc.start(now);
+            osc.stop(now + 0.8);
+
+        } else {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(110, now); 
+            gainNode.gain.setValueAtTime(0.1, now);
+            oscillator.start(now);
+            oscillator.stop(now + 0.2);
+            
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'square';
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.frequency.setValueAtTime(110, now + 0.3);
+            gain2.gain.setValueAtTime(0.1, now + 0.3);
+            osc2.start(now + 0.3);
+            osc2.stop(now + 0.5);
+        }
+    }
+
+    function showPage(pageId) {
+        initAudio(); 
+        const pages = ['main-menu', 'teaching-view', 'teaching-detail-view', 'practice-basic-menu', 'practice-adv-menu', 'game-view', 'summary-view'];
+        pages.forEach(p => document.getElementById(p).classList.add('hidden'));
+        
+        const btnHome = document.getElementById('btn-main-menu');
+        const rootStyles = document.documentElement.style;
+        
+        if (pageId === 'main-menu') {
+            btnHome.classList.add('hidden');
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('page-title').innerText = "SS1中文(字詞學習)";
+            rootStyles.setProperty('--primary-color', '#4CAF50'); 
+        } else {
+            btnHome.classList.remove('hidden');
+            
+            if (pageId === 'teaching') {
+                rootStyles.setProperty('--primary-color', '#F44336'); 
+                currentDictionarySource = 'teaching';
+                renderTeaching();
+                document.getElementById('teaching-view').classList.remove('hidden');
+            } else if (pageId === 'summary') {
+                rootStyles.setProperty('--primary-color', '#2196F3'); 
+                document.getElementById('page-title').innerText = "4. 總結重溫";
+                document.getElementById('summary-view').classList.remove('hidden');
+                renderSummary(0); 
+            } else if (pageId === 'practice-basic-menu') {
+                rootStyles.setProperty('--primary-color', '#FF9800'); 
+                renderMenu('basic');
+                document.getElementById('practice-basic-menu').classList.remove('hidden');
+            } else if (pageId === 'practice-adv-menu') {
+                rootStyles.setProperty('--primary-color', '#4CAF50'); 
+                renderMenu('adv');
+                document.getElementById('practice-adv-menu').classList.remove('hidden');
+            } else if (pageId === 'game-view') {
+                document.getElementById('game-view').classList.remove('hidden');
+            }
+        }
+    }
+
+    function renderTeaching() {
+        document.getElementById('page-title').innerText = "1. 教學模式";
+        const container = document.getElementById('teaching-content');
+        container.innerHTML = '';
+        
+        ["名詞", "動詞", "形容詞"].forEach(type => {
+            let html = `<div class='category-section'><h2>${type}</h2><div class='grid-container'>`;
+            vocabData.filter(v => v.type === type).forEach(v => {
+                html += `<div class='word-card'>
+                            <img src='${v.img1}' onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMzIiPueEoeWcluAHk8L3RleHQ+PC9zdmc+'">
+                            <h3 style="margin: 10px 0;">${v.word}</h3>
+                            <button class='btn-audio' onclick="playAudio('${v.word}')">🔊 讀音</button>
+                            <button class='btn-detail' onclick="showWordDetail(${v.id})">📖 詳細解說</button>
+                         </div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    function showWordDetail(id) {
+        initAudio();
+        const wordData = vocabData.find(w => w.id === id);
+        
+        const pages = ['main-menu', 'teaching-view', 'teaching-detail-view', 'practice-basic-menu', 'practice-adv-menu', 'game-view', 'summary-view'];
+        pages.forEach(p => document.getElementById(p).classList.add('hidden'));
+        document.getElementById('btn-main-menu').classList.remove('hidden');
+        document.getElementById('teaching-detail-view').classList.remove('hidden');
+        document.getElementById('page-title').innerText = "字詞詳細解說";
+
+        const backBtn = document.getElementById('btn-back-to-dict');
+        backBtn.onclick = () => showPage(currentDictionarySource);
+
+        const detailContainer = document.getElementById('teaching-detail-content');
+        detailContainer.innerHTML = `
+            <div class="game-top-area" style="display: flex; flex-direction: column; align-items: center;">
+                <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px;">
+                    <img src="${wordData.img1}" class="detail-top-img" onerror="this.style.display='none'">
+                    <img src="${wordData.img2}" class="detail-top-img" onerror="this.style.display='none'">
+                </div>
+                <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px; margin-top: 20px;">
+                    <div style="font-size: 5em; font-weight: bold; color: black;">${wordData.word}</div>
+                    <button class="btn-audio" style="font-size: 1.5em; padding: 15px 30px;" onclick="playAudio('${wordData.word}')">🔊 播放讀音</button>
+                </div>
+            </div>
+            <div class="detail-box">
+                <p>
+                    <strong>📝 解釋：</strong>${wordData.meaning}
+                    <button class="btn-audio-small" onclick="playAudio('${wordData.meaning}')">🔊 播放</button>
+                </p>
+                <hr style="border: 1px dashed #fbc02d; margin: 20px 0;">
+                <p>
+                    <strong>💬 例句：</strong>${wordData.example}
+                    <button class="btn-audio-small" onclick="playAudio('${wordData.example}')">🔊 播放</button>
+                </p>
+            </div>
+        `;
+    }
+
+    function renderSummary(index) {
+        currentSummaryIndex = index;
+        const data = vocabData[index];
+        
+        const img1 = document.getElementById('summary-img1');
+        const img2 = document.getElementById('summary-img2');
+        
+        img1.src = data.img1;
+        img1.style.display = 'block'; 
+        
+        img2.src = data.img2;
+        img2.style.display = 'block'; 
+        
+        document.getElementById('summary-word').innerText = data.word;
+        document.getElementById('summary-audio-btn').onclick = () => playAudio(data.word);
+
+        const prevBtn = document.getElementById('btn-summary-prev');
+        const nextBtn = document.getElementById('btn-summary-next');
+
+        if (index === 0) {
+            prevBtn.style.visibility = 'hidden'; 
+        } else {
+            prevBtn.style.visibility = 'visible';
+        }
+
+        if (index === vocabData.length - 1) {
+            nextBtn.style.visibility = 'hidden'; 
+        } else {
+            nextBtn.style.visibility = 'visible';
+        }
+    }
+
+    function changeSummary(step) {
+        let newIndex = currentSummaryIndex + step;
+        if (newIndex >= 0 && newIndex < vocabData.length) {
+            renderSummary(newIndex);
+        }
+    }
+
+    function renderMenu(mode) {
+        const list = document.getElementById(mode === 'basic' ? 'basic-q-list' : 'adv-q-list');
+        list.innerHTML = '';
+        vocabData.forEach((v, i) => {
+            const b = document.createElement('button');
+            b.innerText = `第 ${i+1} 題: ${v.word}`;
+            b.style.width = "300px";
+            b.onclick = () => startGame(mode, i);
+            list.appendChild(b);
+        });
+    }
+
+    function startGame(mode, index) {
+        currentGameMode = mode;
+        currentQuestionData = vocabData[index];
+        showPage('game-view');
+        document.getElementById('page-title').innerText = mode === 'basic' ? "練習模式 (初)" : "練習模式 (高)";
+        document.getElementById('btn-back-to-mode').onclick = () => showPage(`practice-${mode}-menu`);
+        document.getElementById('game-result').innerText = '';
+
+        const nextBtn = document.getElementById('btn-next-q');
+        if (index < vocabData.length - 1) {
+            nextBtn.style.display = 'inline-block';
+            nextBtn.onclick = () => startGame(mode, index + 1);
+        } else {
+            nextBtn.style.display = 'none'; 
+        }
+
+        const header = document.getElementById('game-header-area');
+        header.innerHTML = `
+            <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 50px; width: 100%;">
+                
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <div style="font-size: 4em; font-weight: bold; color: black; line-height: 1.2;">${currentQuestionData.word}</div>
+                    <button class="btn-audio" style="font-size: 1.5em; padding: 15px 30px; margin: 0;" onclick="playAudio('${currentQuestionData.word}')">🔊 播放讀音</button>
+                </div>
+
+                <img src="${currentQuestionData.img1}" class="game-top-img" onerror="this.style.display='none'">
+                
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <h3 style="margin: 0 0 15px 0; color: var(--primary-color);">👇 點擊或拖拉到此空格 👇</h3>
+                    <div class="drop-zone" id="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)">放入圖片</div>
+                </div>
+
+            </div>
+        `;
+
+        let wrong = vocabData[Math.floor(Math.random()*8)];
+        while(wrong.id === currentQuestionData.id) wrong = vocabData[Math.floor(Math.random()*8)];
+        
+        let correctImg = (mode === 'basic') ? currentQuestionData.img1 : currentQuestionData.img2;
+        let wrongImg = (mode === 'basic') ? wrong.img1 : (Math.random() > 0.5 ? wrong.img1 : wrong.img2);
+
+        let opts = [{s:correctImg, c:true}, {s:wrongImg, c:false}].sort(() => Math.random()-0.5);
+        const optArea = document.getElementById('options-area');
+        optArea.innerHTML = '';
+        opts.forEach((o, i) => {
+            optArea.innerHTML += `<img src="${o.s}" id="drag${i}" class="draggable-item" draggable="true" ondragstart="drag(event, ${o.c})" onclick="clickAnswer(${o.c}, 'drag${i}')" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyODAiIGhlaWdodD0iMjgwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMjQiPueEoeWcluAHk8L3RleHQ+PC9zdmc+'">`;
+        });
+    }
+
+    function restartGame() { startGame(currentGameMode, vocabData.indexOf(currentQuestionData)); }
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev, isC) { ev.dataTransfer.setData("isC", isC); ev.dataTransfer.setData("id", ev.target.id); }
+
+    function processAnswer(isCorrect, elementId) {
+        if(isCorrect) {
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.innerHTML = '';
+            const draggedElement = document.getElementById(elementId);
+            draggedElement.draggable = false;
+            draggedElement.style.cursor = 'default';
+            dropZone.appendChild(draggedElement);
+            
+            document.getElementById('game-result').innerText = "✅ 太棒了！答對了！";
+            document.getElementById('game-result').style.color = "green";
+            playFeedbackSound(true); 
+        } else {
+            document.getElementById('game-result').innerText = "❌ 答錯了，再試試！";
+            document.getElementById('game-result').style.color = "red";
+            playFeedbackSound(false); 
+        }
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const isC = ev.dataTransfer.getData("isC") === 'true';
+        const id = ev.dataTransfer.getData("id");
+        processAnswer(isC, id);
+    }
+    
+    function clickAnswer(isCorrect, elementId) {
+        processAnswer(isCorrect, elementId);
+    }
+
+    showPage('main-menu');
+</script>
+
+</body>
+</html>
