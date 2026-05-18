@@ -347,7 +347,7 @@
         { id: 3, type: "名詞", word: "小提琴", img1: "p3.jpg", img2: "pp3.png", meaning: "一種用弓拉出聲音的樂器。", example: "弟弟拉小提琴，聲音真好聽。" },
         { id: 4, type: "名詞", word: "長笛", img1: "p4.jpg", img2: "pp4.jpg", meaning: "一種用嘴巴吹的長長樂器。", example: "姐姐吹長笛，聲音很清脆。" },
         { id: 5, type: "動詞", word: "欣賞", img1: "p5.png", img2: "pp5.png", meaning: "用心去看、去聽美好的事物。", example: "我們安靜地欣賞音樂表演。" },
-        { id: 6, type: "動詞", word: "鼓掌", img1: "p6.png", img2: "pp6.jpg", meaning: "拍拍手，表示開心和讚賞。", example: "表演結束，大家一起拍手鼓掌。" },
+        { id: 6, type: "動詞", word: "鼓掌", img1: "p6.PNG", img2: "pp6.jpg", meaning: "拍拍手，表示開心和讚賞。", example: "表演結束，大家一起拍手鼓掌。" },
         { id: 7, type: "形容詞", word: "動聽", img1: "p7.png", img2: "pp7.png", meaning: "聲音很好聽。", example: "這首歌真動聽！" },
         { id: 8, type: "形容詞", word: "完美", img1: "p8.png", img2: "pp8.png", meaning: "做得非常棒，沒有出錯。", example: "這是一場完美的表演。" }
     ];
@@ -367,25 +367,17 @@
         }
     }
 
-    // ★ 修改點：加入了 utterance.rate = 0.75; 來調慢系統語音的速度
+    // ★ 修改點：如果傳入的文字是「場刊」，則播放附檔 p2.mp3；其餘維持系統語音
     function playAudio(text) {
-        // 先取消正在播放的語音，避免重疊
-        window.speechSynthesis.cancel();
-        
         if (text === '場刊') {
+            // 播放同一資料夾下的 p2.mp3
             const audio = new Audio('p2.mp3');
-            // 如果你連「場刊」的 mp3 錄音檔也想調慢，可以取消下面這行的註解並調整數值
-            // audio.playbackRate = 0.8; 
             audio.play();
             return;
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-HK';
-        
-        // ★ 這裡調整速度：1 是正常，小於 1 變慢（建議 0.5 ~ 0.9），大於 1 變快
-        utterance.rate = 0.75; 
-        
         window.speechSynthesis.speak(utterance);
     }
 
