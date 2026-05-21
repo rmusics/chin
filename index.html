@@ -181,7 +181,7 @@
         background-color: white;
     }
 
-    /* 總結重溫專用：超大圖片 (已放大尺寸) */
+    /* 總結重溫專用：超大圖片 */
     .summary-top-img {
         width: 420px; 
         height: 420px;
@@ -367,15 +367,18 @@
         }
     }
 
+    // ★ 修改點：在此處調慢了播放語速
     function playAudio(text) {
         if (text === '場刊') {
             const audio = new Audio('p2.mp3');
+            audio.playbackRate = 0.8; // 【新增】將錄音檔播放速度調慢至 0.8 倍
             audio.play();
             return;
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-HK';
+        utterance.rate = 0.8; // 【新增】將廣東話合成語速調慢至 0.8 倍（預設為 1.0）
         window.speechSynthesis.speak(utterance);
     }
 
@@ -658,7 +661,6 @@
     function allowDrop(ev) { ev.preventDefault(); }
     function drag(ev, isC) { ev.dataTransfer.setData("isC", isC); ev.dataTransfer.setData("id", ev.target.id); }
 
-    // ★ 修改點：在 isCorrect (答對) 的區塊內加入了清空選項欄位的程式碼
     function processAnswer(isCorrect, elementId) {
         if(isCorrect) {
             const dropZone = document.getElementById('drop-zone');
@@ -668,7 +670,6 @@
             draggedElement.style.cursor = 'default';
             dropZone.appendChild(draggedElement);
             
-            // 【新增】答對後清空整個下方選項區域，讓錯誤答案消失不見
             document.getElementById('options-area').innerHTML = '';
             
             document.getElementById('game-result').innerText = "✅ 恭喜答啱咗";
