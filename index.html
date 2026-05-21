@@ -56,7 +56,8 @@
         transition: 0.3s;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
-    button:hover { filter: brightness(0.9); transform: translateY(-2px); }
+    button:hover:not(:disabled) { filter: brightness(0.9); transform: translateY(-2px); }
+    button:disabled { background-color: #ccc !important; cursor: not-allowed; box-shadow: none; transform: none; }
     
     /* 主選單的正方形按鈕樣式 */
     .menu-square-btn {
@@ -269,7 +270,7 @@
                     <h2 style="color: #555; font-size: 2.8em; margin: 0;">欣賞演奏會</h2>
                     <button class="btn-audio" style="margin: 0; padding: 15px 25px; border-radius: 15px;" onclick="playAudio('欣賞演奏會')">🔊 讀音</button>
                 </div>
-                <img src="unit-cover.png" style="max-height: 250px; max-width: 400px; width: auto; height: auto; object-fit: contain; border-radius: 15px; border: 4px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background-color: white; padding: 5px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMzIiPueEoeWcluAHk8L3RleHQ+PC9zdmc+'">
+                <img src="unit-cover.png" style="max-height: 250px; max-width: 400px; width: auto; height: auto; object-fit: contain; border-radius: 15px; border: 4px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); background-color: white; padding: 5px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw =\"">
             </div>
 
             <div style="display: flex; flex-direction: row; justify-content: center; gap: 30px; flex-wrap: wrap;">
@@ -328,7 +329,7 @@
             </div>
 
             <div id="game-result"></div>
-            <button onclick="restartGame()">🔄 重新開始本題</button>
+            <button id="btn-restart" onclick="restartGame()">🔄 重新開始本題</button>
             <button id="btn-next-q">⏭️ 下一題</button>
             <button id="btn-back-to-mode">🔙 返回選單</button>
         </div>
@@ -367,10 +368,9 @@
         }
     }
 
-    // ★ 修改點：如果傳入的文字是「場刊」，則播放附檔 p2.mp3；其餘維持系統語音
+    // 播放語音
     function playAudio(text) {
         if (text === '場刊') {
-            // 播放同一資料夾下的 p2.mp3
             const audio = new Audio('p2.mp3');
             audio.play();
             return;
@@ -378,6 +378,33 @@
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-HK';
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // 專為答題反饋設計的朗讀函數，支援播放完畢的回調函數（用以控制按鈕解鎖）
+    function playFeedbackSpeech(text, callback) {
+        if (!window.speechSynthesis) {
+            if (callback) callback();
+            return;
+        }
+        window.speechSynthesis.cancel(); // 停止之前未完的語音
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-HK';
+        
+        let isCalled = false;
+        const handleEnd = () => {
+            if (!isCalled) {
+                isCalled = true;
+                if (callback) callback();
+            }
+        };
+
+        utterance.onend = handleEnd;
+        utterance.onerror = handleEnd;
+        
+        // 安全機制：若瀏覽器語音因故沒有觸發 onend，4 秒後自動解鎖按鈕
+        setTimeout(handleEnd, 4000);
+
         window.speechSynthesis.speak(utterance);
     }
 
@@ -615,6 +642,9 @@
         document.getElementById('btn-back-to-mode').onclick = () => showPage(`practice-${mode}-menu`);
         document.getElementById('game-result').innerText = '';
 
+        // 確保新一題開始時，所有按鈕狀態重設為啟用
+        setGameButtonsDisabled(false);
+
         const nextBtn = document.getElementById('btn-next-q');
         if (index < vocabData.length - 1) {
             nextBtn.style.display = 'inline-block';
@@ -648,46 +678,81 @@
         let correctImg = (mode === 'basic') ? currentQuestionData.img1 : currentQuestionData.img2;
         let wrongImg = (mode === 'basic') ? wrong.img1 : (Math.random() > 0.5 ? wrong.img1 : wrong.img2);
 
-        let opts = [{s:correctImg, c:true}, {s:wrongImg, c:false}].sort(() => Math.random()-0.5);
+        // 將答案文字傳遞進去選項中
+        let opts = [
+            {s:correctImg, c:true, w:currentQuestionData.word}, 
+            {s:wrongImg, c:false, w:wrong.word}
+        ].sort(() => Math.random()-0.5);
+
         const optArea = document.getElementById('options-area');
         optArea.innerHTML = '';
         opts.forEach((o, i) => {
-            optArea.innerHTML += `<img src="${o.s}" id="drag${i}" class="draggable-item" draggable="true" ondragstart="drag(event, ${o.c})" onclick="clickAnswer(${o.c}, 'drag${i}')" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyODAiIGhlaWdodD0iMjgwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMjQiPueEoeWcluAHk8L3RleHQ+PC9zdmc+'">`;
+            optArea.innerHTML += `<img src="${o.s}" id="drag${i}" class="draggable-item" draggable="true" ondragstart="drag(event, ${o.c}, '${o.w}')" onclick="clickAnswer(${o.c}, 'drag${i}', '${o.w}')" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyODAiIGhlaWdodD0iMjgwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMjQiPueEoeWcluAHk8L3RleHQ+PC9zdmc+'">`;
         });
     }
 
     function restartGame() { startGame(currentGameMode, vocabData.indexOf(currentQuestionData)); }
     function allowDrop(ev) { ev.preventDefault(); }
-    function drag(ev, isC) { ev.dataTransfer.setData("isC", isC); ev.dataTransfer.setData("id", ev.target.id); }
+    
+    function drag(ev, isC, word) { 
+        ev.dataTransfer.setData("isC", isC); 
+        ev.dataTransfer.setData("id", ev.target.id); 
+        ev.dataTransfer.setData("word", word); 
+    }
 
-    function processAnswer(isCorrect, elementId) {
-        if(isCorrect) {
-            const dropZone = document.getElementById('drop-zone');
-            dropZone.innerHTML = '';
-            const draggedElement = document.getElementById(elementId);
+    // 批量啟用或禁用遊戲控制按鈕
+    function setGameButtonsDisabled(disabled) {
+        document.getElementById('btn-restart').disabled = disabled;
+        document.getElementById('btn-next-q').disabled = disabled;
+        document.getElementById('btn-back-to-mode').disabled = disabled;
+        document.getElementById('btn-main-menu').disabled = disabled;
+    }
+
+    function processAnswer(isCorrect, elementId, answerWord) {
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.innerHTML = '';
+        
+        // 移入所選的圖片到答題框內 (無論對錯都放入)
+        const draggedElement = document.getElementById(elementId);
+        if (draggedElement) {
             draggedElement.draggable = false;
             draggedElement.style.cursor = 'default';
             dropZone.appendChild(draggedElement);
-            
-            document.getElementById('game-result').innerText = "✅ 太棒了！答對了！";
-            document.getElementById('game-result').style.color = "green";
+        }
+        
+        // 答題後的畫面改為顯示「多謝回答！你答了(答案)」
+        const feedbackText = `多謝回答！你答了${answerWord}`;
+        const resultEl = document.getElementById('game-result');
+        
+        if(isCorrect) {
+            resultEl.innerText = "✅ " + feedbackText;
+            resultEl.style.color = "green";
             playFeedbackSound(true); 
         } else {
-            document.getElementById('game-result').innerText = "❌ 答錯了，再試試！";
-            document.getElementById('game-result').style.color = "red";
+            resultEl.innerText = "❌ " + feedbackText;
+            resultEl.style.color = "red";
             playFeedbackSound(false); 
         }
+
+        // 鎖定所有控制按鈕，直到句子朗讀完畢
+        setGameButtonsDisabled(true);
+
+        // 讀出句子，讀完後再解鎖按鈕
+        playFeedbackSpeech(feedbackText, function() {
+            setGameButtonsDisabled(false);
+        });
     }
 
     function drop(ev) {
         ev.preventDefault();
         const isC = ev.dataTransfer.getData("isC") === 'true';
         const id = ev.dataTransfer.getData("id");
-        processAnswer(isC, id);
+        const word = ev.dataTransfer.getData("word");
+        processAnswer(isC, id, word);
     }
     
-    function clickAnswer(isCorrect, elementId) {
-        processAnswer(isCorrect, elementId);
+    function clickAnswer(isCorrect, elementId, word) {
+        processAnswer(isCorrect, elementId, word);
     }
 
     showPage('main-menu');
